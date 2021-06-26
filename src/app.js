@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { connect, set } from 'mongoose';
 import { dbConnection } from './database';
+import errorMiddleware from './middlewares/error.middleware'
 
 
 
@@ -27,7 +28,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(errorMiddleware);
 
 async function connectToDatabase() {
   try {
@@ -43,7 +44,7 @@ async function connectToDatabase() {
 }
 
 app.get('/', (req, res) => {
-  Response(res, { status: 200, message: 'Welcome to Workflow package delivery' });
+  Response(res, { status: 200, message: 'Welcome to inspector database' });
 });
 
 customAPI(app);
