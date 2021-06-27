@@ -8,32 +8,24 @@ import HttpException from '../exceptions/HttpException';
 const JWT_SECRET = getEnv('JWT_SECRET');
 
 
-export const registerInspector = async (res, userData) => {
-    if (!userData.email || !userData.password) Response(res, { status: 400, message: 'Please enter an email and password' });
-
-    const findUser = await userModel.findOne({ email: userData.email });
-    if (findUser)
-    Response(res, { status: 409, message: `Your email ${userData.email} already exists` });
-
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-    const createUserData = await userModel.create({ ...userData, password: hashedPassword });
-
-    return createUserData;
-
+export const registerInspector = async (userData) => {
+      const findUser = await userModel.findOne({ email: userData.email });
+      if (findUser) return false;
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const createUserData = await userModel.create({ ...userData, password: hashedPassword });
+      createUserData.id = null;
+      createUserData.hashedPassword = null
+      return createUserData;
+    
 }
 
-export const loginInspector = async (res, userData) => {
-
-    if (!userData.email || !userData.password) 
-    Response(res, { status: 400, message: 'Please enter email and password' });
+export const loginInspector = async (userData) => {
 
     const findUser = await userModel.findOne({ email: userData.email });
-    if (!findUser) 
-    Response(res, { status: 409, message: `Email ${userData.email} not found, Please register` });
+    if (!findUser) return 'INVALID_EMAIL';
 
     const isPasswordMatching = await bcrypt.compare(userData.password, findUser.password);
-    if (!isPasswordMatching)
-    Response(res, { status: 409, message: "Wrong password, try again" });
+    if (!isPasswordMatching) return 'WRONG_PASSWORD'
 
     const tokenData = createToken(findUser);
     const cookie = createCookie(tokenData);
@@ -54,10 +46,10 @@ export const loginInspector = async (res, userData) => {
   }
 
   export async function logoutInspector (userData) {
-    if (!userData) throw new HttpException(400, "You're not userData");
+    if (!userData) return 'NOT_AVAILABLE';
 
     const findUser = await userModel.findOne({ email: userData.email, password: userData.password });
-    if (!findUser) throw new HttpException(409, `You're email ${userData.email} not found`);
+    // if (!findUser) throw new HttpException(409, `You're email ${userData.email} not found`);
 
     return findUser;
   }
