@@ -19,6 +19,22 @@ export const registerInspector = async (userData) => {
     
 }
 
+export const updateInspector = async (user, userData) => {
+  let createUserData = {}
+  const unique_id = user.unique_id;
+  const findUser = await userModel.findOne({ email: userData.email });
+  if (findUser && findUser.email !== user.email) return false;
+  if(userData.password) {
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
+  createUserData = await userModel.findOneAndUpdate({ unique_id }, { ...userData, password: hashedPassword }, {new: true});
+  }
+  else createUserData = await userModel.findOneAndUpdate({ unique_id }, { ...userData }, {new: true});
+  createUserData.id = null;
+  createUserData.hashedPassword = null
+  return createUserData;
+
+}
+
 export const loginInspector = async (userData) => {
 
     const findUser = await userModel.findOne({ email: userData.email });
