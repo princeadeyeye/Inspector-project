@@ -1,5 +1,5 @@
 import uniqid  from 'uniqid';
-import { registerInspector, loginInspector, logoutInspector } from "../../services/auth.service";
+import { registerInspector, loginInspector, logoutInspector, updateInspector } from "../../services/auth.service";
 import { Response } from '../../utils/index';
 
 export const inspectorSignup = async (req, res, next) => {
@@ -49,5 +49,29 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: `${logOutUserData.inspector_name} has successfullly logout` });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getProfile = async (req, res, next) => {
+  try {
+    const userData = req.user;
+    if(!userData) return Response(res, { status: 403, message: `An error has occured, please login` });
+    return Response(res, { status: 200, data: {id: userData.unique_id, email: userData.email, name: userData.inspector_name}, message: 'successfully fetch user data' });
+  } catch(error) {
+    next(error)
+  }
+}
+
+export const updateProfile = async (req, res, next) => {
+  try {
+    let userData = req.body;
+    const { user } = req;
+        const { inspector_name } = req.body;
+        if(inspector_name) userData.inspector_name = `${inspector_name}`.toUpperCase();
+        let signUpUserData = await updateInspector(user, userData);
+        if(!signUpUserData) return Response(res, { status: 409, message: `${userData.email} has been used, update failed` });
+        return Response(res, { status: 200, data: {id: signUpUserData.unique_id, email: signUpUserData.email, name: signUpUserData.inspector_name}, message: 'successfully updated' });
+  }catch(error) {
+    next(error)
   }
 }
