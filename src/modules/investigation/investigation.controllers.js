@@ -13,8 +13,8 @@ import {
 export const createInvestigation = async(req, res, next) => {
     try {
     let request_body = req.body;
+    if(!request_body) return Response(res, { status: 400, message: 'Enter the investigation info' }); 
     const { user } = req;
-    console.log(user, 'auth user');
     const unique_id = uniqid();
     let { inspector_name, investigation_data } = request_body;
     inspector_name = `${inspector_name}`.toUpperCase();
@@ -22,8 +22,7 @@ export const createInvestigation = async(req, res, next) => {
     
     const userData = await findUserByName(inspector_name);
     if(!userData) return Response(res, { status: 400, message: 'This investigator does not exist' }); 
-    
-    console.log(userData, 'invest user');
+
     if(userData.unique_id !== user.unique_id) return Response(res, { status: 409, message: 'Investigator not permitted' }); 
     request_body.unique_id = unique_id;
     request_body.inspector_name = inspector_name;

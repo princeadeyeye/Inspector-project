@@ -46,7 +46,7 @@ export const loginInspector = async (userData) => {
     const tokenData = createToken(findUser);
     const cookie = createCookie(tokenData);
 
-    return { cookie, findUser };
+    return { cookie, tokenData, findUser };
 }
 
   function createToken(user) {

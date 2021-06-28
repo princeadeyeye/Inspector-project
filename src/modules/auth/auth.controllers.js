@@ -26,13 +26,14 @@ export const inspectorLogin = async (req, res, next) => {
     if(successfulLogin === 'INVALID_EMAIL') return Response(res, { status: 409, message: `Email ${userData.email} not found, Please register` });
     if(successfulLogin === 'WRONG_PASSWORD') return Response(res, { status: 409, message: `Wrong password, try again` });
 
-    const { cookie, findUser } = successfulLogin
+    const { cookie, tokenData, findUser } = successfulLogin
 
     res.setHeader('Set-Cookie', [cookie]);
     return res.status(200).json({ 
       message: 'login successfully',
       data: { id: findUser.unique_id, email: findUser.email, name: findUser.inspector_name }, 
-      token: cookie
+      token: tokenData.token,
+      cookie
        });
   } catch (error) {
     next(error);
