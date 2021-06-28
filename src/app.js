@@ -18,12 +18,7 @@ const port = getEnv('PORT', 9000);
 connectToDatabase();
 
 app.use(
-  cors({
-    origin: '*',
-    methods: 'GET,PUT,PATCH,POST,DELETE',
-    preflightContinue: false,
-    optionsSuccessStatus: 204,
-  })
+  cors({ origin: true, credentials: true })
 );
 app.use(cookieParser());
 app.use(express.json());
